@@ -10,19 +10,38 @@ const openValve = () => {
   }, 100)
 }
 
+type GameState = 'not playing' | 'playing' | 'ended'
+const COOLOFF_TIME = 500
+
 export default () => {
   const [startTime, setStartTime] = useState()
-  const [timer, setTimer] = useState()
+  const [, forceUpdate] = useState()
 
-  let stop = () => {
-    clearTimeout(timer)
-    closeValve()
-  }
   const start = useCallback(() => {
-    setStartTime(Date.now())
-    const update = () => setTimer(setTimeout(update, 30))
-    openValve()
-    update()
+    let lastTimeReadingChanged = 0
+    let lastReading = 0
+    let gameState: GameState = 'not playing'
+    let timer = -1
+    const stop = () => clearInterval(timer)
+    const watchValve = () => {
+      if (gameState === 'not playing' && readingFromScale !== 0) {
+        gameState = 'playing'
+        setStartTime(Date.now())
+      }
+
+      if (gameState === 'playing') {
+        if (lastReading !== readingFromScale) {
+          lastTimeReadingChanged = Date.now()
+          lastReading = readingFromScale
+        } else if (Date.now() - lastTimeReadingChanged >= COOLOFF_TIME) {
+          gameState = 'ended'
+          stop()
+        }
+      }
+
+      forceUpdate(Math.random())
+    }
+    timer = setInterval(watchValve, 100)
   }, [])
 
   const timePassed = startTime ? (Date.now() - startTime) / 1000 : 0
@@ -53,8 +72,9 @@ export default () => {
         />
       </div>
 
-      <button onClick={start}>Open valves!</button>
-      <button onClick={stop}>Close valves!</button>
+      <button onClick={start}>Start game!</button>
+      <button onClick={openValve}>Open valves!</button>
+      <button onClick={closeValve}>Close valves!</button>
     </div>
   )
 }
@@ -76,5 +96,5 @@ const score = (timePassed: number, readingFromScale: number) => {
     MAX_SCORE - MAX_SCORE * projectedTimeDiff * 0.1,
     MIN_SCORE
   )
-  return finalScore * percentOfTimePassed
+  return finalScore * percentOfTimePassed || 0
 }
