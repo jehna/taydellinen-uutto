@@ -6,11 +6,14 @@
     "@grammarly/focal": "^0.8.0-alpha.0",
     "@types/react": "^16.9.2",
     "@types/react-dom": "^16.9.0",
+    "@types/styled-components": "^4.1.18",
     "btscale": "^0.9.0",
+    "cypress": "^3.4.1",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-scripts": "3.1.1",
     "rxjs": "^6.5.3",
+    "styled-components": "^4.3.2",
     "typescript": "^3.6.2"
   },
   "scripts": {
