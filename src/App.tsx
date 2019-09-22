@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react'
+import ScaleConnect from './ScaleConnect'
 
 let readingFromScale = 0
 let foo = 0
@@ -75,6 +76,7 @@ export default () => {
       <button onClick={start}>Start game!</button>
       <button onClick={openValve}>Open valves!</button>
       <button onClick={closeValve}>Close valves!</button>
+      <ScaleConnect />
     </div>
   )
 }
