@@ -73,8 +73,15 @@ export default () => {
         const s2 = unsigned8Arr.getUint8(s)
         if (s2 == 5) {
           // WEIGHT
-          //wt_event wt_event = new wt_event(ByteDataHelper.getByteArrayFromU1(unsigned8Arr2, s + 1, wt_event.getSize()));
-          console.log([...new Uint8Array(unsigned8Arr.buffer.slice(s, s + 7))])
+          const weight =
+            new Uint32Array(unsigned8Arr.buffer.slice(s + 1, s + 5))[0] / 100
+          console.log(weight)
+          /*
+          [5, 168, 112, 0, 0, 2, 0] // 288.4
+          [5, 0, 0, 0, 0, 2, 0] // 0
+          [5, 161, 180, 0, 0, 2, 0] // 462.4
+          */
+
           s += 6
           length -= 6
         } else if (s2 == 6) {
