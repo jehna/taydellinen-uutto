@@ -64,22 +64,50 @@ export default () => {
 
     await scale.startNotifications()
 
-    /*scale.addEventListener('characteristicvaluechanged', (e: any) =>
-      console.log(e.target.value)
-    )*/
+    scale.addEventListener('characteristicvaluechanged', (e: any) => {
+      const unsigned8Arr = (e.target.value as (typeof scale)['value'])!
 
+      let length = unsigned8Arr.byteLength
+      let s = 1
+      while (length > 0 && s != unsigned8Arr.byteLength) {
+        const s2 = unsigned8Arr.getUint8(s)
+        if (s2 == 5) {
+          // WEIGHT
+          //wt_event wt_event = new wt_event(ByteDataHelper.getByteArrayFromU1(unsigned8Arr2, s + 1, wt_event.getSize()));
+          console.log([...new Uint8Array(unsigned8Arr.buffer.slice(s, s + 7))])
+          s += 6
+          length -= 6
+        } else if (s2 == 6) {
+          // Battery
+          length--
+          s++
+        } else if (s2 == 7) {
+          // Timer
+          s += 3
+          length -= 3
+        } else if (s2 == 8) {
+          // Key
+          s++
+          length--
+        } else if (11) {
+          s += 2
+          length -= 2
+        }
+
+        s++
+        length--
+      }
+    })
     /*setInterval(async () => {
       await scale.writeValue(heartbeat())
       console.log(scale.value!)
     }, 1000)*/
 
-    setInterval(() => scale.writeValue(force_handshake()), 1000)
-    setInterval(() => scale.writeValue(heartbeat()), 1000)
-    await scale.writeValue(getScaleStatus())
-    console.log(scale.value)
+    setInterval(() => scale.writeValue(force_handshake()), 3000)
+    setInterval(() => scale.writeValue(heartbeat()), 3000)
 
-    /*await scale.writeValue(packet.encodeGetBattery())
-    console.log(await scale.readValue())*/
+    await sleep(4000)
+    await scale.writeValue(defEvent())
   }, [])
   return (
     <div>
@@ -88,9 +116,9 @@ export default () => {
   )
 }
 
-const checksum = (data: number[]) => {
-  let sum1 = -1
-  let sum2 = -1
+const checksum = (data: number[], initial: number) => {
+  let sum1 = initial
+  let sum2 = initial
   for (let i = 0; i < data.length; i++) {
     if (i % 2 === 0) {
       sum1 = sum1 + data[i]
@@ -103,7 +131,7 @@ const checksum = (data: number[]) => {
 
 const HEADER = [239, 221]
 
-const pack = (action: number, data: number[]) => {
+const pack = (action: number, data: number[], initial = -1) => {
   const result = new Uint8Array(data.length + 5)
 
   result[0] = HEADER[0]
@@ -114,15 +142,44 @@ const pack = (action: number, data: number[]) => {
     result[i + 3] = data[i]
   }
 
-  const [cs1, cs2] = checksum(data)
+  const [cs1, cs2] = checksum(data, initial)
   result[data.length + 3] = cs1
   result[data.length + 4] = cs2
 
   return result
 }
 
+const packEvent = (arr: Uint8Array, s: number, s2: number, s3: number) => {
+  arr[s] = s2
+  const s4 = s + 1
+  const s5 = [1, 1, 1, 0, 0, 6, 1, 3, 1, 2, 3, 2][s2]
+  if (s5 == 1) {
+    arr[s4] = s3
+  }
+  return s5 + 1
+}
+
+const defEvent = () => {
+  const ls = new Uint8Array(9)
+  const event1 = packEvent(ls, 1, 0, 1) + 1
+  const event2 = event1 + packEvent(ls, event1, 1, 2)
+  const event3 = event2 + packEvent(ls, event2, 2, 5)
+  const event4 = event3 + packEvent(ls, event3, 3, 0)
+  const event5 = event4 + packEvent(ls, event4, 4, 0)
+  ls[0] = event5
+
+  console.log([...pack(12, [...ls], 0)].map(e => e.toString(16)))
+  return pack(12, [...ls], 0)
+}
+
 const heartbeat = () => {
   const data = [0x02, 0x00]
+  const action = 0
+  return pack(action, data)
+}
+
+const getWeight = () => {
+  const data = [1]
   const action = 0
   return pack(action, data)
 }
