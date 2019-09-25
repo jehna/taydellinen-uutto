@@ -5,6 +5,7 @@ import { round } from './utils/math-utils'
 import MockValve from './components/Debug/Debug'
 import Game from './Game'
 import StartGame from './components/StartGame/StartGame'
+import Playing from './components/Playing/Playing'
 
 export default () => {
   return (
@@ -12,16 +13,7 @@ export default () => {
       {({ timePassed, startGame, state }) => (
         <div>
           {(state === 'playing' || state === 'waiting for valve to open') && (
-            <>
-              <div>
-                Grams:
-                <h1>{round(getWeight(), 1)}</h1>
-              </div>
-              <div>
-                Timer:
-                <h1>{round(timePassed, 1)} s</h1>
-              </div>
-            </>
+            <Playing timePassed={timePassed} />
           )}
 
           {state === 'ended' && (
