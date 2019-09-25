@@ -8,6 +8,7 @@ const Page = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  background: #d3122a;
 `
 
 const Button = styled.button`
@@ -24,13 +25,17 @@ const Button = styled.button`
 `
 Button.defaultProps = { type: 'button' }
 
+const Logo = styled.img`
+  margin-bottom: 3em;
+`
+
 type StartGameProps = {
   onStart: () => void
 }
 
 export default ({ onStart }: StartGameProps) => (
   <Page>
-    <h1>Täydellinen uutto</h1>
+    <Logo src="/img/logo.svg" alt="Täydellinen uutto" />
     <Button onClick={onStart}>Start game</Button>
   </Page>
 )
