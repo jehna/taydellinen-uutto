@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react'
 import * as packet from 'btscale/lib/packet'
 import { setWeight } from './global-weight'
+import Button from './components/Common/Button'
 
 const sleep = (time: number) =>
   new Promise(resolve => setTimeout(resolve, time))
@@ -122,11 +123,7 @@ export default () => {
     await sleep(4000)
     await scale.writeValue(defEvent())
   }, [])
-  return (
-    <div>
-      <button onClick={connect}>Connect scale</button>
-    </div>
-  )
+  return <Button onClick={connect}>Connect scale</Button>
 }
 
 const checksum = (data: number[], initial: number) => {
