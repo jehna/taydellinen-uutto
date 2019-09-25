@@ -3,7 +3,7 @@ import MockValve from './components/Debug/Debug'
 import Game from './Game'
 import StartGame from './components/StartGame/StartGame'
 import Playing from './components/Playing/Playing'
-import Score from './components/Score/Score'
+import GameOver from './components/GameOver/GameOver'
 
 export default () => {
   return (
@@ -17,7 +17,7 @@ export default () => {
             case 'waiting for valve to open':
               return <Playing timePassed={timePassed} />
             case 'ended':
-              return <Score timePassed={timePassed} />
+              return <GameOver timePassed={timePassed} />
           }
         }}
       </Game>
