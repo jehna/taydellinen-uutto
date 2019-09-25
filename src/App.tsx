@@ -4,26 +4,34 @@ import { getWeight } from './global-weight'
 import { round } from './utils/math-utils'
 import MockValve from './components/Debug/Debug'
 import Game from './Game'
+import StartGame from './components/StartGame/StartGame'
 
 export default () => {
   return (
     <Game>
-      {({ timePassed, startGame }) => (
+      {({ timePassed, startGame, state }) => (
         <div>
-          <div>
-            Grams:
-            <h1>{round(getWeight(), 1)}</h1>
-          </div>
-          <div>
-            Timer:
-            <h1>{round(timePassed, 1)} s</h1>
-          </div>
-          <div>
-            Score:
-            <h1>{round(score(timePassed, getWeight()), -1)}</h1>
-          </div>
+          {(state === 'playing' || state === 'waiting for valve to open') && (
+            <>
+              <div>
+                Grams:
+                <h1>{round(getWeight(), 1)}</h1>
+              </div>
+              <div>
+                Timer:
+                <h1>{round(timePassed, 1)} s</h1>
+              </div>
+            </>
+          )}
 
-          <button onClick={startGame}>Start game!</button>
+          {state === 'ended' && (
+            <div>
+              Score:
+              <h1>{round(score(timePassed, getWeight()), -1)}</h1>
+            </div>
+          )}
+
+          {state === 'not playing' && <StartGame onStart={startGame} />}
           <ScaleConnect />
 
           {process.env.NODE_ENV !== 'production' && <MockValve />}

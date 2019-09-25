@@ -1,7 +1,11 @@
 import React from 'react'
 import { getWeight } from './global-weight'
 
-type GameState = 'not playing' | 'playing' | 'ended'
+type GameState =
+  | 'not playing'
+  | 'waiting for valve to open'
+  | 'playing'
+  | 'ended'
 
 type GameComponentState = {
   currentState: GameState
@@ -33,10 +37,15 @@ export default class Game extends React.Component<
   }
 
   startGame() {
+    this.setState({ currentState: 'waiting for valve to open' })
+
     const watchValve = () => {
       const readingFromScale = getWeight()
 
-      if (this.state.currentState === 'not playing' && readingFromScale > 0.2) {
+      if (
+        this.state.currentState === 'waiting for valve to open' &&
+        readingFromScale > 0.2
+      ) {
         this.setState({ currentState: 'playing' })
         this.startTime = Date.now()
       }
