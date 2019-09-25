@@ -2,7 +2,7 @@ import React from 'react'
 import ScaleConnect from './ScaleConnect'
 import { getWeight } from './global-weight'
 import { round } from './utils/math-utils'
-import MockValve from './MockValve'
+import MockValve from './components/Debug/Debug'
 import Game from './Game'
 
 export default () => {

@@ -1,5 +1,20 @@
 import React from 'react'
-import { getWeight, setWeight } from './global-weight'
+import styled from 'styled-components'
+import { getWeight, setWeight } from '../../global-weight'
+
+const Wrapper = styled.div`
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  background: #fff;
+  border-left: 1px solid #000;
+  border-top: 1px solid #000;
+  padding: 0.6em 0.4em;
+
+  h3 {
+    margin: 0.2em;
+  }
+`
 
 let valveOpenInterval = 0
 const closeValve = () => clearInterval(valveOpenInterval)
@@ -13,7 +28,7 @@ const openValve = () => {
 }
 
 export default () => (
-  <>
+  <Wrapper>
     <div>
       <h3>Debug:</h3>
       <div>Tamping pressure:</div>
@@ -28,5 +43,5 @@ export default () => (
     </div>
     <button onClick={openValve}>Open valves!</button>
     <button onClick={closeValve}>Close valves!</button>
-  </>
+  </Wrapper>
 )
