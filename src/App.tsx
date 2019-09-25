@@ -1,15 +1,8 @@
 import React, { useCallback, useState } from 'react'
 import ScaleConnect from './ScaleConnect'
-
-let readingFromScale = 0
-let foo = 0
-const closeValve = () => clearInterval(foo)
-const openValve = () => {
-  foo = setInterval(() => {
-    readingFromScale +=
-      (0.8 + Math.random() * 0.2) * (window as any).tampingPressure.value
-  }, 100)
-}
+import { getWeight } from './global-weight'
+import { round } from './utils/math-utils'
+import MockValve from './MockValve'
 
 type GameState = 'not playing' | 'playing' | 'ended'
 const COOLOFF_TIME = 500
@@ -25,7 +18,9 @@ export default () => {
     let timer = -1
     const stop = () => clearInterval(timer)
     const watchValve = () => {
-      if (gameState === 'not playing' && readingFromScale !== 0) {
+      const readingFromScale = getWeight()
+
+      if (gameState === 'not playing' && readingFromScale > 0.2) {
         gameState = 'playing'
         setStartTime(Date.now())
       }
@@ -51,7 +46,7 @@ export default () => {
     <div>
       <div>
         Grams:
-        <h1>{round(readingFromScale, 1)}</h1>
+        <h1>{round(getWeight(), 1)}</h1>
       </div>
       <div>
         Timer:
@@ -59,29 +54,16 @@ export default () => {
       </div>
       <div>
         Score:
-        <h1>{round(score(timePassed, readingFromScale), -1)}</h1>
-      </div>
-      <div>
-        <div>Tamping pressure:</div>
-        <input
-          type="range"
-          min="0.1"
-          max="1.0"
-          step="0.01"
-          defaultValue="0.19"
-          id="tampingPressure"
-        />
+        <h1>{round(score(timePassed, getWeight()), -1)}</h1>
       </div>
 
       <button onClick={start}>Start game!</button>
-      <button onClick={openValve}>Open valves!</button>
-      <button onClick={closeValve}>Close valves!</button>
       <ScaleConnect />
+
+      {process.env.NODE_ENV !== 'production' && <MockValve />}
     </div>
   )
 }
-
-const round = (num: number, n: number) => Math.round(num * 10 ** n) / 10 ** n
 
 const TARGET_TIME = 25
 const TARGET_GRAMS = 42

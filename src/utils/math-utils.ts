@@ -1,0 +1,1 @@
+export const round = (num: number, n: number) => Math.round(num * 10 ** n) / 10 ** n
