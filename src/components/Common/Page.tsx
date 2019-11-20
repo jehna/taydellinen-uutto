@@ -7,5 +7,5 @@ export default styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  background: #d3122a;
+  background: #FFF;
 `
