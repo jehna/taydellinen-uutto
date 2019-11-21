@@ -3,20 +3,8 @@ import Page, { Header, Footer, Handle, Nozzle, Cup, Main } from '../Common/Page'
 import Score, { score } from '../Score/Score'
 import { cupFullness } from '../../utils/cup-utils'
 import { round } from '../../utils/math-utils'
-import styled, { keyframes } from 'styled-components'
+import styled from 'styled-components'
 import Button from '../Common/Button'
-
-const popUp = keyframes`
-  from {
-    transform: translateY(100px);
-    opacity: 0;
-  }
-
-  to {
-    transform: none;
-    opacity: 1;
-  }
-`
 
 const GameOverModal = styled.dialog`
   border-radius: 1em;

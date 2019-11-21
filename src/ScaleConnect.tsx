@@ -1,5 +1,4 @@
 import React from 'react'
-import * as packet from 'btscale/lib/packet'
 import Button from './components/Common/Button'
 import { Scale } from './Scale'
 
@@ -97,9 +96,9 @@ const bindOnWeightChange = (onWeigthChange: (weight: number) => void) => (
 
     let length = unsigned8Arr.byteLength
     let s = 1
-    while (length > 0 && s != unsigned8Arr.byteLength) {
+    while (length > 0 && s !== unsigned8Arr.byteLength) {
       const s2 = unsigned8Arr.getUint8(s)
-      if (s2 == 5) {
+      if (s2 === 5) {
         // WEIGHT
         const weight =
           new Uint32Array(unsigned8Arr.buffer.slice(s + 1, s + 5))[0] / 100
@@ -113,15 +112,15 @@ const bindOnWeightChange = (onWeigthChange: (weight: number) => void) => (
 
         s += 6
         length -= 6
-      } else if (s2 == 6) {
+      } else if (s2 === 6) {
         // Battery
         length--
         s++
-      } else if (s2 == 7) {
+      } else if (s2 === 7) {
         // Timer
         s += 3
         length -= 3
-      } else if (s2 == 8) {
+      } else if (s2 === 8) {
         // Key
         s++
         length--
