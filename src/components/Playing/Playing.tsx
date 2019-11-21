@@ -1,22 +1,95 @@
 import React from 'react'
 import { round } from '../../utils/math-utils'
-import Page from '../Common/Page'
-import Score from '../Score/Score'
+import Page, { Header, Footer, Handle, Nozzle, Cup, Main } from '../Common/Page'
+import Score, { TARGET_GRAMS } from '../Score/Score'
+import { Scale } from '../../Scale'
+
+const TIMER_START_THRESHOLD = 0.2
+const COOLOFF_TIME = 500
 
 type PlyaingProps = {
+  scale: Scale
+  onEnded: (weight: number, timePassed: number) => void
+}
+
+type PlyaingState = {
+  weight: number
   timePassed: number
 }
 
-export default ({ timePassed }: PlyaingProps) => (
-  <Page>
-    <div>
-      Grams:
-      <h1>{round(getWeight(), 1)}</h1>
-    </div>
-    <div>
-      Timer:
-      <h1>{round(timePassed, 1)} s</h1>
-    </div>
-    <Score timePassed={timePassed} />
-  </Page>
-)
+export default class Playing extends React.Component<
+  PlyaingProps,
+  PlyaingState
+> {
+  state = { weight: 0, timePassed: 0 }
+  startedTiemr: number | null = null
+  lastReading = 0
+  lastTimeReadingChanged = -1
+
+  componentDidMount() {
+    this.props.scale.onWeightChange = this.setWeigth
+  }
+
+  setWeigth = (weight: number) => {
+    this.setState({ weight })
+    if (weight > TIMER_START_THRESHOLD && !this.startedTiemr) {
+      this.startTimer()
+    }
+  }
+
+  startTimer() {
+    const timerStartedAt = Date.now()
+    this.startedTiemr = setInterval(() => {
+      this.setState({ timePassed: (Date.now() - timerStartedAt) / 1000 })
+      this.watchValve()
+    }, 100)
+  }
+
+  watchValve() {
+    if (!this.startedTiemr) {
+      return
+    }
+
+    if (this.lastReading !== this.state.weight) {
+      this.lastTimeReadingChanged = Date.now()
+      this.lastReading = this.state.weight
+    } else if (Date.now() - this.lastTimeReadingChanged >= COOLOFF_TIME) {
+      this.stopTimer()
+      this.props.onEnded(this.state.weight, this.state.timePassed)
+    }
+  }
+
+  stopTimer() {
+    if (this.startedTiemr) clearInterval(this.startedTiemr)
+  }
+
+  cupFullness() {
+    const perfectCupFullness = 0.9
+    return Math.min(1, (this.state.weight / TARGET_GRAMS) * perfectCupFullness)
+  }
+
+  render() {
+    const { weight, timePassed } = this.state
+
+    return (
+      <Page>
+        <Header>Täydellinen uutto</Header>
+        <Main>
+          <Handle />
+          <Nozzle on={this.state.timePassed > 0} />
+          <Cup amount={this.cupFullness()} />
+        </Main>
+        <Footer>
+          <div>
+            Weight: <strong>{round(weight, 1)}g</strong>
+          </div>
+          <div>Time: {round(timePassed, 1)}s</div>
+          <div>
+            Score: <Score timePassed={timePassed} weight={weight} />
+            /1000
+          </div>
+        </Footer>
+      </Page>
+    )
+  }
+}

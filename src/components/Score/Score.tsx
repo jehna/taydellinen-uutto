@@ -3,17 +3,15 @@ import { round } from '../../utils/math-utils'
 
 type ScoreProps = {
   timePassed: number
+  weight: number
 }
 
-export default ({ timePassed }: ScoreProps) => (
-  <div>
-    Score:
-    <h1>{round(score(timePassed, getWeight()), -1)}</h1>
-  </div>
+export default ({ timePassed, weight }: ScoreProps) => (
+  <>{round(score(timePassed, weight), -1)}</>
 )
 
 const TARGET_TIME = 25
-const TARGET_GRAMS = 42
+export const TARGET_GRAMS = 42
 const MAX_SCORE = 1000
 const MIN_SCORE = 100
 const score = (timePassed: number, readingFromScale: number) => {

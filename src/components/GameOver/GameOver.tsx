@@ -4,10 +4,11 @@ import Score from '../Score/Score'
 
 type GameOverProps = {
   timePassed: number
+  weigth: number
 }
 
-export default ({ timePassed }: GameOverProps) => (
+export default ({ timePassed, weigth }: GameOverProps) => (
   <Page>
-    <Score timePassed={timePassed} />
+    <Score timePassed={timePassed} weight={weigth} />
   </Page>
 )
