@@ -1,8 +1,9 @@
 import React from 'react'
 import { round } from '../../utils/math-utils'
 import Page, { Header, Footer, Handle, Nozzle, Cup, Main } from '../Common/Page'
-import Score, { TARGET_GRAMS } from '../Score/Score'
+import Score from '../Score/Score'
 import { Scale } from '../../Scale'
+import { cupFullness } from '../../utils/cup-utils'
 
 const TIMER_START_THRESHOLD = 0.2
 const COOLOFF_TIME = 500
@@ -63,11 +64,6 @@ export default class Playing extends React.Component<
     if (this.startedTiemr) clearInterval(this.startedTiemr)
   }
 
-  cupFullness() {
-    const perfectCupFullness = 0.9
-    return Math.min(1, (this.state.weight / TARGET_GRAMS) * perfectCupFullness)
-  }
-
   render() {
     const { weight, timePassed } = this.state
 
@@ -77,7 +73,7 @@ export default class Playing extends React.Component<
         <Main>
           <Handle />
           <Nozzle on={this.state.timePassed > 0} />
-          <Cup amount={this.cupFullness()} />
+          <Cup amount={cupFullness(this.state.weight)} />
         </Main>
         <Footer>
           <div>

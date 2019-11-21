@@ -14,7 +14,7 @@ const TARGET_TIME = 25
 export const TARGET_GRAMS = 42
 const MAX_SCORE = 1000
 const MIN_SCORE = 100
-const score = (timePassed: number, readingFromScale: number) => {
+export const score = (timePassed: number, readingFromScale: number) => {
   const clampReadingFromScale = Math.min(readingFromScale, TARGET_GRAMS)
 
   const projectionTimeOnTargetGrams =

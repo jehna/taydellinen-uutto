@@ -5,7 +5,10 @@ import Playing from './components/Playing/Playing'
 import GameOver from './components/GameOver/GameOver'
 import { Scale } from './Scale'
 
-type GameState = { type: 'not started' } | { type: 'started'; scale: Scale }
+type GameState =
+  | { type: 'not started' }
+  | { type: 'started'; scale: Scale }
+  | { type: 'ended'; weight: number; timePassed: number; scale: Scale }
 
 export default () => {
   const [state, setState] = useState<GameState>({ type: 'not started' })
@@ -13,10 +16,20 @@ export default () => {
     <>
       {state.type === 'not started' ? (
         <StartGame onStart={scale => setState({ type: 'started', scale })} />
-      ) : (
+      ) : state.type === 'started' ? (
         <Playing
           scale={state.scale}
-          onEnded={() => console.log('Game over!')}
+          onEnded={(weight, timePassed) =>
+            setState({ type: 'ended', weight, timePassed, scale: state.scale })
+          }
+        />
+      ) : (
+        <GameOver
+          weight={state.weight}
+          timePassed={state.timePassed}
+          onStartNewGame={() =>
+            setState({ type: 'started', scale: state.scale })
+          }
         />
       )}
 

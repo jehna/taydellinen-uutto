@@ -67,7 +67,7 @@ export const Handle = styled.div`
   }
 `
 
-export const Nozzle = styled.div<{ on: boolean }>`
+export const Nozzle = styled.div<{ on: boolean; reverse?: boolean }>`
   background: #3d535e;
   height: 0.9em;
   width: 1.7em;
@@ -86,7 +86,7 @@ export const Nozzle = styled.div<{ on: boolean }>`
     height: calc(35.88vh - 2.4em - 0.8em);
     transition: transform 0.5s;
     transform: scaleY(${({ on }) => (on ? 1 : 0)});
-    transform-origin: 0 0;
+    transform-origin: 0 ${({ reverse }) => (reverse ? 100 : 0)}%;
   }
 `
 
