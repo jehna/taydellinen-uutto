@@ -2,6 +2,10 @@ import React from 'react'
 import Button from './components/Common/Button'
 import { Scale } from './Scale'
 
+/**
+ * Ok, this file is a huge mess. I'll clean it up later. Pinky-promise 🤙
+ */
+
 const sleep = (time: number) =>
   new Promise(resolve => setTimeout(resolve, time))
 
