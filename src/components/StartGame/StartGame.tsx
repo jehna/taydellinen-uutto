@@ -3,6 +3,8 @@ import styled from 'styled-components'
 import Page from '../Common/Page'
 import ScaleConnect from '../../ScaleConnect'
 import Button from '../Common/Button'
+import { Scale } from '../../Scale'
+import { mockScale } from '../Debug/Debug'
 
 const Buttons = styled.div`
   display: flex;
@@ -10,7 +12,7 @@ const Buttons = styled.div`
   align-items: center;
   justify-content: center;
   text-align: center;
-  margin-top: -2em 0;
+  flex: 1;
 
   button:first-child {
     margin-bottom: 0.5em;
@@ -98,7 +100,7 @@ const Nozzle = styled.div<{ on: boolean }>`
     width: 0.4em;
     height: calc(35.88vh - 2.4em - 0.8em);
     transition: transform 0.5s;
-    transform: scaleY(${({on}) => on ? 1 : 0});
+    transform: scaleY(${({ on }) => (on ? 1 : 0)});
     transform-origin: 0 0;
   }
 `
@@ -153,21 +155,35 @@ type StartGameProps = {
   onStart: () => void
 }
 
-export default ({ onStart }: StartGameProps) => {
-  const [started, setStarted] = useState(false)
+export default () => {
+  const [connectedScale, setConnectedScale] = useState<Scale | null>(null)
   return (
     <StartPage>
       <Header>Täydellinen uutto</Header>
       <Main>
         <Handle />
-        <Nozzle on={started} />
+        <Nozzle on={false} />
 
         <Buttons>
-          {!started && <Button onClick={() => setStarted(true)}>Start game</Button>}
-          {/*<ScaleConnect />*/}
+          {connectedScale ? (
+            <Button onClick={() => console.log('Start game!')}>
+              Start game
+            </Button>
+          ) : (
+            <>
+              <ScaleConnect
+                onScaleConnected={scale => setConnectedScale(scale)}
+              />
+              {process.env.NODE_ENV !== 'production' && (
+                <Button onClick={() => setConnectedScale(mockScale)}>
+                  Use debug scale
+                </Button>
+              )}
+            </>
+          )}
         </Buttons>
 
-        <Cup amount={started ? 0.5 : 0} />
+        <Cup amount={0} />
       </Main>
       <Footer>The perfect extraction</Footer>
     </StartPage>

@@ -1,5 +1,4 @@
 import React from 'react'
-import { getWeight } from './global-weight'
 
 type GameState =
   | 'not playing'
@@ -9,12 +8,14 @@ type GameState =
 
 type GameComponentState = {
   currentState: GameState
+  scaleConnected: false
 }
 
 type GameProps = {
   children: (props: {
     state: GameState
     timePassed: number
+    scaleConnected: boolean
     startGame: () => void
   }) => JSX.Element | null
 }
@@ -25,7 +26,7 @@ export default class Game extends React.Component<
   GameProps,
   GameComponentState
 > {
-  state: GameComponentState = { currentState: 'not playing' }
+  state: GameComponentState = { currentState: 'not playing', scaleConnected: false }
 
   lastTimeReadingChanged = 0
   lastReading = 0
@@ -69,6 +70,7 @@ export default class Game extends React.Component<
     return this.props.children({
       state: this.state.currentState,
       timePassed: this.startTime ? (Date.now() - this.startTime) / 1000 : 0,
+      scaleConnected: this.state.scaleConnected,
       startGame: () => this.startGame()
     })
   }

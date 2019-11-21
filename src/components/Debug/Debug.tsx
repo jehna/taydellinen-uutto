@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { getWeight, setWeight } from '../../global-weight'
+import { Scale } from '../../Scale'
 
 const Wrapper = styled.div`
   position: fixed;
@@ -17,31 +17,40 @@ const Wrapper = styled.div`
 `
 
 let valveOpenInterval = 0
+let weight = 0
 const closeValve = () => clearInterval(valveOpenInterval)
 const openValve = () => {
   valveOpenInterval = setInterval(() => {
-    setWeight(
-      getWeight() +
-        (0.8 + Math.random() * 0.2) * (window as any).tampingPressure.value
-    )
+    weight +=
+      (0.8 + Math.random() * 0.2) * (window as any).tampingPressure.value
+    mockScale.onWeightChange(weight)
   }, 100)
 }
 
-export default () => (
-  <Wrapper>
-    <div>
-      <h3>Debug:</h3>
-      <div>Tamping pressure:</div>
-      <input
-        type="range"
-        min="0.1"
-        max="1.0"
-        step="0.01"
-        defaultValue="0.19"
-        id="tampingPressure"
-      />
-    </div>
-    <button onClick={openValve}>Open valves!</button>
-    <button onClick={closeValve}>Close valves!</button>
-  </Wrapper>
-)
+export const mockScale: Scale = {
+  onWeightChange: () => {},
+  startListeningChanges: () => {
+    weight = 0
+  }
+}
+
+export default () => {
+  return (
+    <Wrapper>
+      <div>
+        <h3>Debug:</h3>
+        <div>Tamping pressure:</div>
+        <input
+          type="range"
+          min="0.1"
+          max="1.0"
+          step="0.01"
+          defaultValue="0.19"
+          id="tampingPressure"
+        />
+      </div>
+      <button onClick={openValve}>Open valves!</button>
+      <button onClick={closeValve}>Close valves!</button>
+    </Wrapper>
+  )
+}

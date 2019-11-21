@@ -1,7 +1,7 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import * as packet from 'btscale/lib/packet'
-import { setWeight } from './global-weight'
 import Button from './components/Common/Button'
+import { Scale } from './Scale'
 
 const sleep = (time: number) =>
   new Promise(resolve => setTimeout(resolve, time))
@@ -60,70 +60,82 @@ const connectScale = async () => {
   console.log(characteristic)*/
 }
 
-export default () => {
-  const connect = useCallback(async () => {
-    const scale = await connectScale()
+type ScaleConnectProps = {
+  onScaleConnected: (scale: Scale) => void
+}
 
-    await scale.startNotifications()
+export default ({ onScaleConnected }: ScaleConnectProps) => {
+  const connect = async () => {
+    const device = await connectScale()
+    const scale: Scale = {
+      onWeightChange: () => {},
+      startListeningChanges: async () => {
+        await device.startNotifications()
 
-    scale.addEventListener('characteristicvaluechanged', (e: any) => {
-      try {
-        const unsigned8Arr = (e.target.value as (typeof scale)['value'])!
+        device.addEventListener(
+          'characteristicvaluechanged',
+          bindOnWeightChange(weight => scale.onWeightChange(weight))
+        )
+        setInterval(() => device.writeValue(force_handshake()), 3000)
+        setInterval(() => device.writeValue(heartbeat()), 3000)
 
-        let length = unsigned8Arr.byteLength
-        let s = 1
-        while (length > 0 && s != unsigned8Arr.byteLength) {
-          const s2 = unsigned8Arr.getUint8(s)
-          if (s2 == 5) {
-            // WEIGHT
-            const weight =
-              new Uint32Array(unsigned8Arr.buffer.slice(s + 1, s + 5))[0] / 100
-            console.log(weight)
-            setWeight(weight)
-            /*
-          [5, 168, 112, 0, 0, 2, 0] // 288.4
-          [5, 0, 0, 0, 0, 2, 0] // 0
-          [5, 161, 180, 0, 0, 2, 0] // 462.4
-          */
-
-            s += 6
-            length -= 6
-          } else if (s2 == 6) {
-            // Battery
-            length--
-            s++
-          } else if (s2 == 7) {
-            // Timer
-            s += 3
-            length -= 3
-          } else if (s2 == 8) {
-            // Key
-            s++
-            length--
-          } else if (11) {
-            s += 2
-            length -= 2
-          }
-
-          s++
-          length--
-        }
-      } catch (e) {
-        console.error(e)
+        await sleep(4000)
+        await device.writeValue(defEvent())
       }
-    })
-    /*setInterval(async () => {
-      await scale.writeValue(heartbeat())
-      console.log(scale.value!)
-    }, 1000)*/
+    }
+    onScaleConnected(scale)
+  }
 
-    setInterval(() => scale.writeValue(force_handshake()), 3000)
-    setInterval(() => scale.writeValue(heartbeat()), 3000)
-
-    await sleep(4000)
-    await scale.writeValue(defEvent())
-  }, [])
   return <Button onClick={connect}>Connect scale</Button>
+}
+
+const bindOnWeightChange = (onWeigthChange: (weight: number) => void) => (
+  e: any
+) => {
+  try {
+    const unsigned8Arr = (e.target.value as DataView)!
+
+    let length = unsigned8Arr.byteLength
+    let s = 1
+    while (length > 0 && s != unsigned8Arr.byteLength) {
+      const s2 = unsigned8Arr.getUint8(s)
+      if (s2 == 5) {
+        // WEIGHT
+        const weight =
+          new Uint32Array(unsigned8Arr.buffer.slice(s + 1, s + 5))[0] / 100
+        console.log(weight)
+        onWeigthChange(weight)
+        /*
+      [5, 168, 112, 0, 0, 2, 0] // 288.4
+      [5, 0, 0, 0, 0, 2, 0] // 0
+      [5, 161, 180, 0, 0, 2, 0] // 462.4
+      */
+
+        s += 6
+        length -= 6
+      } else if (s2 == 6) {
+        // Battery
+        length--
+        s++
+      } else if (s2 == 7) {
+        // Timer
+        s += 3
+        length -= 3
+      } else if (s2 == 8) {
+        // Key
+        s++
+        length--
+      } else if (11) {
+        s += 2
+        length -= 2
+      }
+
+      s++
+      length--
+    }
+  } catch (e) {
+    console.error(e)
+  }
 }
 
 const checksum = (data: number[], initial: number) => {

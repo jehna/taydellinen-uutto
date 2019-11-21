@@ -8,19 +8,7 @@ import GameOver from './components/GameOver/GameOver'
 export default () => {
   return (
     <>
-      <Game>
-        {({ timePassed, startGame, state }) => {
-          switch (state) {
-            case 'not playing':
-              return <StartGame onStart={startGame} />
-            case 'playing':
-            case 'waiting for valve to open':
-              return <Playing timePassed={timePassed} />
-            case 'ended':
-              return <GameOver timePassed={timePassed} />
-          }
-        }}
-      </Game>
+      <StartGame />
 
       {process.env.NODE_ENV !== 'production' && <MockValve />}
     </>

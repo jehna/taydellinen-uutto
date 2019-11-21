@@ -1,6 +1,5 @@
 import React from 'react'
 import { round } from '../../utils/math-utils'
-import { getWeight } from '../../global-weight'
 import Page from '../Common/Page'
 import Score from '../Score/Score'
 
