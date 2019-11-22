@@ -4,6 +4,7 @@ import Page, { Header, Footer, Handle, Nozzle, Cup, Main } from '../Common/Page'
 import Score from '../Score/Score'
 import { Scale } from '../../Scale'
 import { cupFullness } from '../../utils/cup-utils'
+import { throttle } from '../../utils/time-utils'
 
 const TIMER_START_THRESHOLD = 0.2
 const COOLOFF_TIME = 500
@@ -28,7 +29,8 @@ export default class Playing extends React.Component<
   lastTimeReadingChanged = -1
 
   componentDidMount() {
-    this.props.scale.onWeightChange = this.setWeigth
+    this.props.scale.onWeightChange = throttle(100, this.setWeigth)
+    this.props.scale.startListeningChanges()
   }
 
   setWeigth = (weight: number) => {

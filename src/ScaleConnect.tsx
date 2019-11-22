@@ -73,20 +73,20 @@ export default ({ onScaleConnected }: ScaleConnectProps) => {
     const scale: Scale = {
       onWeightChange: () => {},
       startListeningChanges: async () => {
-        await device.startNotifications()
-
         device.addEventListener(
           'characteristicvaluechanged',
           bindOnWeightChange(weight => scale.onWeightChange(weight))
         )
-        setInterval(() => device.writeValue(force_handshake()), 3000)
-        setInterval(() => device.writeValue(heartbeat()), 3000)
-
-        await sleep(4000)
-        await device.writeValue(defEvent())
       }
     }
     onScaleConnected(scale)
+
+    await device.startNotifications()
+    setInterval(() => device.writeValue(force_handshake()), 3000)
+    setInterval(() => device.writeValue(heartbeat()), 3000)
+
+    await sleep(4000)
+    await device.writeValue(defEvent())
   }
 
   return <Button onClick={connect}>Connect scale</Button>
@@ -107,7 +107,9 @@ const bindOnWeightChange = (onWeigthChange: (weight: number) => void) => (
         const weight =
           new Uint32Array(unsigned8Arr.buffer.slice(s + 1, s + 5))[0] / 100
         console.log(weight)
-        onWeigthChange(weight)
+        if (weight < 10000)
+          // Some bug, just quick wokraround for now
+          onWeigthChange(weight)
         /*
       [5, 168, 112, 0, 0, 2, 0] // 288.4
       [5, 0, 0, 0, 0, 2, 0] // 0
