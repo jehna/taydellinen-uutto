@@ -79,7 +79,7 @@ export default ({ timePassed, weight, onStartNewGame }: GameOverProps) => {
           <Score timePassed={timePassed} weight={weight} />
           /1000
         </ScoreResult>
-        <Button onClick={onStartNewGame}>Start a new game</Button>
+        <Button onClick={() => document.location.reload()}>Start a new game</Button>
       </GameOverModal>
     </Page>
   )
